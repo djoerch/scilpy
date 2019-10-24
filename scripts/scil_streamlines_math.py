@@ -90,6 +90,12 @@ def build_args_p():
                    help='Save the streamline indices to the supplied '
                    'json file.')
 
+
+    p.add_argument('--no-bbox-check', action='store_true',
+                   help='Avoid check if all streamline coordinates are within '
+                   'proper bounding box in voxel space.\nWARNING: By using this option '
+                   'ill-formatted tractograms are not being detected.')
+
     add_verbose_arg(p)
     add_overwrite_arg(p)
 
@@ -99,7 +105,7 @@ def build_args_p():
 def load_data(parser, args, path):
     logging.info(
         'Loading streamlines from {0}.'.format(path))
-    sft = load_tractogram_with_reference(parser, args, path)
+    sft = load_tractogram_with_reference(parser, args, path, bbox_check=not args.no_bbox_check)
     streamlines = list(sft.streamlines)
     data_per_streamline = sft.data_per_streamline
     data_per_point = sft.data_per_point
@@ -175,7 +181,7 @@ def main():
     sft = StatefulTractogram(new_streamlines, reference_file, Space.RASMM,
                              data_per_streamline=new_data_per_streamline,
                              data_per_point=new_data_per_point)
-    save_tractogram(sft, args.output)
+    save_tractogram(sft, args.output, bbox_valid_check=not args.no_bbox_check)
 
 
 if __name__ == "__main__":
